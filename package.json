@@ -1,6 +1,6 @@
 {
 	"name": "units",
-	"version": "0.0.2",
+	"version": "1.0.0",
 	"description": "Module-like system with two step initialization",
 	"keywords": ["module", "init"],
 	"author": {
@@ -10,7 +10,7 @@
 	"preferGlobal": false,
 	"private": false,
 	"engines": {
-		"node": ">=0.8.0"
+		"node": ">=4.0.0"
 	},
 	"repository": {
 		"type": "git",
