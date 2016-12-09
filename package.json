@@ -1,23 +1,27 @@
 {
-	"name": "units",
-	"version": "1.0.0",
-	"description": "Module-like system with two step initialization",
-	"keywords": ["module", "init"],
-	"author": {
-		"name": "Dmitry Smolin",
-		"email": "dimsmol@gmail.com"
-	},
-	"preferGlobal": false,
-	"private": false,
-	"engines": {
-		"node": ">=4.0.0"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/dimsmol/units"
-	},
-	"directories": {
-		"lib": "./lib"
-	},
-	"main": "./lib/index"
+  "author": {
+    "email": "dimsmol@gmail.com",
+    "name": "Dmitry Smolin"
+  },
+  "bugs": {
+    "url": "https://github.com/dimsmol/units/issues"
+  },
+  "description": "Module-like system with two step initialization",
+  "directories": {
+    "lib": "./lib"
+  },
+  "homepage": "https://github.com/dimsmol/units#readme",
+  "keywords": [
+    "init",
+    "module"
+  ],
+  "main": "./lib/index",
+  "name": "units",
+  "preferGlobal": false,
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimsmol/units.git"
+  },
+  "version": "1.0.0"
 }

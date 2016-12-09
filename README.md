@@ -4,8 +4,6 @@ Module-like system with two step initialization.
 
 Units provides an ability to add number of component instances to a set and then call init function on each of them with guarantee that all other components are instantiated.
 
-Can also be used on client side using [browserify](https://github.com/substack/node-browserify) or similar tool.
-
 ## Example
 
 ```js
@@ -60,6 +58,13 @@ childUnits.get('db'); // will try to find 'db' in childUnits, then in units
 * get(key) - gets unit under key specified, tries parent if no unit found and parent is present, takes into account aliases
 * require(key) - calls get() internally and returns result if not null, otherwise throws an error
 * init() - calls unitInit() method on all added units except added with opt_skipInit=true
+
+## Iterable
+```js
+  for (let key of unitSet) {
+    console.log(key); // will print all units keys from this unit set
+  }
+```
 
 ## Unit
 
