@@ -48,16 +48,77 @@ childUnits.get('db'); // will try to find 'db' in childUnits, then in units
 
 ## UnitSet methods
 
-* alias(key, dstKey) - sets alias for key: dstKey will be obtained instead of key on get() and require() calls
-* add(key, unit) - adds unit under key specified
-* expose(key, obj) - like add(key, obj), but unitInit() will not be called on this unit (so, unit may omit unitInit() implementation), used to expose constant or any object without unitInit() method as a unit
-* addInitRequired(key, unit) - like add(key, obj), but will ensure that unitInit() is called on that unit when it's being got by get() or require(), for units that are unusable unless inited
-* addSet(key, units) - makes units child UnitSet, adds all child units to itself under key specified
+### add()
+
+adds units or units sets
+
+You can use it as aliases for `addAll` and `addSet` methods. However there is one more posibility. You can add plain object, not a Unit or UnitSet, and it will create UnitSet automatically. Examples:
+
+```js
+units.add('user', {
+  api: new Api(),
+  controller: new Controller()
+})
+
+//or
+
+units.add('user', () => {
+  return {
+    api: new Api(),
+    controller: new Controller()
+  }
+})
+```
+
+
+
+### alias(key, dstKey)
+
+Sets alias for key: dstKey will be obtained instead of key on get() and require() calls
+
+### expose(key, obj)
+
+like add(key, obj), but unitInit() will not be called on this unit (so, unit may omit unitInit() implementation), used to expose constant or any object without unitInit() method as a unit
+
+### addInitRequired(key, unit)
+
+like add(key, obj), but will ensure that unitInit() is called on that unit when it's being got by get() or require(), for units that are unusable unless inited
+
+### addAll(obj)
+
+adds all units sets from object with coresponding keys
+
+### addSet(key, units)
+
+makes units child UnitSet, adds all child units to itself under key specified
 	* units has a unit with key '~', it will be added directly under key specified, instead of key+'.~'
-* joinSet(units) - add all units of UnitSet specified to self, without any extra magic
-* get(key) - gets unit under key specified, tries parent if no unit found and parent is present, takes into account aliases
-* require(key) - calls get() internally and returns result if not null, otherwise throws an error
-* init() - calls unitInit() method on all added units except added with opt_skipInit=true
+
+### joinSet(units)
+
+add all units of UnitSet specified to self, without any extra magic
+
+### get(key)
+
+gets unit under key specified, tries parent if no unit found and parent is present, takes into account aliases
+
+### require(key)
+
+calls get() internally and returns result if not null, otherwise throws an error
+
+### match(regexp, function)
+
+calls the `function` for every unit that matches `regexp`. First argument in the function is always the matched unit. All others are matches from the regexp.
+
+```js
+  //example from matter-in-motion lib
+  units
+    .get('resources')
+    .match('^(.*)\.api$', (unit, name) => console.log(name));
+```
+
+### init()
+
+calls unitInit() method on all added units except added with opt_skipInit=true
 
 ## Iterable
 ```js
