@@ -12,7 +12,7 @@ var units = new UnitSet();
 var LogicA = function () {
 };
 
-LogicA.prototype.unitInit = function (units) {
+LogicA.prototype.__init = function (units) {
 	// all units are instantiated at this point
 	// getting components we're depended on
 	this.db = units.require('db');
@@ -25,7 +25,7 @@ units.add('logic.a', new LogicA());
 units.add('logic.b', new LogicB());
 units.add('facade', new Facade());
 
-units.init(); // calls unitInit() function of every unit internally
+units.init(); // calls __init() function of every unit internally
 ```
 
 ## Parent units
@@ -78,11 +78,11 @@ Sets alias for key: dstKey will be obtained instead of key on get() and require(
 
 ### expose(key, obj)
 
-like add(key, obj), but unitInit() will not be called on this unit (so, unit may omit unitInit() implementation), used to expose constant or any object without unitInit() method as a unit
+like `add(key, obj)`, but `__init` will not be called on this unit (so, unit may omit `__init` implementation), used to expose constant or any object without `__init` method as a unit
 
 ### addInitRequired(key, unit)
 
-like add(key, obj), but will ensure that unitInit() is called on that unit when it's being got by get() or require(), for units that are unusable unless inited
+like `add(key, obj)`, but will ensure that `__init` is called on that unit when it's being got by `get` or `require`, for units that are unusable unless inited
 
 ### addAll(obj)
 
@@ -103,11 +103,11 @@ gets unit under key specified, tries parent if no unit found and parent is prese
 
 ### require(key)
 
-calls get() internally and returns result if not null, otherwise throws an error
+calls `get` internally and returns result if not null, otherwise throws an error
 
 ### match(regexp, function)
 
-calls the `function` for every unit that matches `regexp`. First argument in the function is always the matched unit. All others are matches from the regexp.
+calls the `function` for every unit name that matches `regexp`. First argument in the function is always the matched unit. All others are matches from the regexp.
 
 ```js
   //example from matter-in-motion lib
@@ -118,7 +118,7 @@ calls the `function` for every unit that matches `regexp`. First argument in the
 
 ### init()
 
-calls unitInit() method on all added units except added with opt_skipInit=true
+calls `__init` method on all added units
 
 ## Iterable
 ```js
@@ -131,7 +131,7 @@ calls unitInit() method on all added units except added with opt_skipInit=true
 
 Unit class is actually an interface.
 You can inherit it to make obvious that your subclass is Unit.
-But you can also just implement unitInit() without inheriting Unit.
+But you can also just implement `__init` without inheriting Unit.
 
 ## License
 
