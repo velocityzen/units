@@ -116,6 +116,14 @@ calls the `function` for every unit name that matches `regexp`. First argument i
     .match('^(.*)\.api$', (unit, name) => console.log(name));
 ```
 
+### forEach(function)
+
+calls the 'function' for evry unit.
+
+```js
+  units.forEach((unit, name) => console.log(name));
+```
+
 ### init()
 
 calls `__init` method on all added units
