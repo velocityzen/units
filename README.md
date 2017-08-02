@@ -1,4 +1,7 @@
-# units
+# Units
+
+[![NPM Version](https://img.shields.io/npm/v/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
+[![NPM Downloads](https://img.shields.io/npm/dt/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 
 Module-like system with two step initialization.
 
