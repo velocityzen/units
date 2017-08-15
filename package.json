@@ -21,5 +21,11 @@
     "type": "git",
     "url": "git+https://github.com/velocityzen/units.git"
   },
-  "version": "2.0.1"
+  "version": "2.0.1",
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0"
+  }
 }

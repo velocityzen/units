@@ -3,59 +3,102 @@
 [![NPM Version](https://img.shields.io/npm/v/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 [![NPM Downloads](https://img.shields.io/npm/dt/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 
-Module-like system with two step initialization.
-
-Units provides an ability to add number of component instances to a set and then call init function on each of them with guarantee that all other components are instantiated.
+Module-like system with two step initialization and definable namespaces for application modules.
 
 ## Example
 
 ```js
-var units = new UnitSet();
+const units = new UnitSet();
 
-var LogicA = function () {
+const Controller = function () {
+  this.db = undefined;
 };
 
-LogicA.prototype.__init = function (units) {
-	// all units are instantiated at this point
-	// getting components we're depended on
-	this.db = units.require('db');
-	this.logicB = units.require('logic.b');
+Controller.prototype.__init = function (units) {
+  // all units are instantiated at this point
+  // getting components we're depended on
+  this.db = units.require('db');
 };
 
-units.add('db', new Db(someDbArgs));
-units.add('settings', new Settings('/path/to/project/root/or/something'));
-units.add('logic.a', new LogicA());
-units.add('logic.b', new LogicB());
-units.add('facade', new Facade());
+units.add({
+  controller: new Controller()
+});
 
 units.init(); // calls __init() function of every unit internally
 ```
 
-## Parent units
+## Unit
 
-UnitSet can be added to other UnitSet which will be it's parent. On getting keys, lookup will be performed locally first, then on parent UnitSet. All child units will be added directly to parent and inited by parent as well.
+Unit is a simple interface
 
 ```js
-var units = new UnitSet();
+const Controller = function () {
+  this.db = undefined;
+};
 
-units.add('db', new Db());
-
-var childUnits = new UnitSet();
-childUnits.add('logic.a', new LogicA());
-childUnits.add('logic.b', new LogicB());
-
-units.addSet(childUnits);
-
-childUnits.get('db'); // will try to find 'db' in childUnits, then in units
+Controller.prototype.__init = function (units) {
+  // all units are instantiated at this point
+  // getting components we're depended on
+  this.db = units.require('db');
+};
 ```
 
-## UnitSet methods
+### Interface methods
 
-### add()
+#### __init
+Function, unit initialisation
+
+#### __initRequired
+Boolean, means that this unit, when required, will be returned inited
+
+#### __instance
+Function, If method present it will be called when a unit is required and it should return what you want to return instead of the unit class itself.
+
+## UnitSet
+
+`UnitSet` is a set of units. The root `UnitSet` that will contain all others you should create manually. All others will be created as in the example:
+
+```js
+// this is our root unit set
+const units = new UnitSet();
+
+units.add({
+  resources: {
+    user {
+      api: new Api(),
+      controller: new Controller()
+    },
+    post: {
+      api: new Api(),
+      controller: new Controller()
+    }
+  }
+});
+```
+
+This will create unit sets `resources`, `user`, `post` with units `api` and `controller`. From `resources.post.api` you have access to all units:
+
+```js
+const Api = function() {
+  this.ctrl = undefined;
+}
+
+Api.prototype.__init = function(units) {
+  //require the post controller
+  this.ctrl = units.require('controller');
+  //require the user controller
+  this.user = units.require('user.controller');
+}
+
+```
+
+### Methods
+
+#### add()
 
 adds units or units sets
 
-You can use it as aliases for `addAll` and `addSet` methods. However there is one more posibility. You can add plain object, not a Unit or UnitSet, and it will create UnitSet automatically. Examples:
+You can use it as aliases for `addAll` and `addSet` methods. However, there is one more possibility. You can add a plain object, not a Unit or UnitSet, and it will create UnitSet automatically. Examples:
 
 ```js
 units.add('user', {
@@ -73,15 +116,17 @@ units.add('user', () => {
 })
 ```
 
-
-
-### alias(key, dstKey)
+#### alias(key, dstKey)
 
 Sets alias for key: dstKey will be obtained instead of key on get() and require() calls
 
-### expose(key, obj)
+#### expose(key, obj)
 
-like `add(key, obj)`, but `__init` will not be called on this unit (so, unit may omit `__init` implementation), used to expose constant or any object without `__init` method as a unit
+like `add(key, obj)`, but `__init` will not be called on this unit (so, a unit may omit `__init` implementation), used to expose constant or any object without `__init` method as a unit
+
+#### extend(key, obj)
+
+Like expose but if unit `key` exist just extends it with `obj`
 
 ### addInitRequired(key, unit)
 
@@ -89,12 +134,12 @@ like `add(key, obj)`, but will ensure that `__init` is called on that unit when 
 
 ### addAll(obj)
 
-adds all units sets from object with coresponding keys
+adds all units sets from object with corresponding keys
 
 ### addSet(key, units)
 
 makes units child UnitSet, adds all child units to itself under key specified
-	* units has a unit with key '~', it will be added directly under key specified, instead of key+'.~'
+  * units have a unit with key '~', it will be added directly under key specified, instead of key+'.~'
 
 ### joinSet(units)
 
@@ -106,11 +151,11 @@ gets unit under key specified, tries parent if no unit found and parent is prese
 
 ### require(key)
 
-calls `get` internally and returns result if not null, otherwise throws an error
+calls `get` internally and returns a result if not null, otherwise, throws an error
 
 ### match(regexp, function)
 
-calls the `function` for every unit name that matches `regexp`. First argument in the function is always the matched unit. All others are matches from the regexp.
+calls the `function` for every unit name that matches `regexp`. The first argument in the function is always the matched unit. All others are matches from the regexp.
 
 ```js
   //example from matter-in-motion lib
@@ -138,12 +183,5 @@ calls `__init` method on all added units
   }
 ```
 
-## Unit
 
-Unit class is actually an interface.
-You can inherit it to make obvious that your subclass is Unit.
-But you can also just implement `__init` without inheriting Unit.
-
-## License
-
-MIT
+License MIT
