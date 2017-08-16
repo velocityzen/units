@@ -98,3 +98,26 @@ test('fails require undefined unit', t => {
     t.pass();
   }
 });
+
+test('adds and require \'~\' unit', t => {
+  const root = new UnitSet();
+  const Unit = function() {};
+  Unit.prototype = {
+    __init: function(units) {
+      t.is(units.require('test'), 'test');
+    },
+    __instance: function() {
+      return 'test'
+    }
+  };
+
+  root.add({
+    test: {
+      '~': new Unit()
+    }
+  });
+
+  root.init();
+  const res = root.require('test');
+  t.is(res, 'test');
+});
