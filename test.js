@@ -121,3 +121,30 @@ test('adds and require \'~\' unit', t => {
   const res = root.require('test');
   t.is(res, 'test');
 });
+
+test('adds a unit then adds another unit under the same namespace', t => {
+  const root = new UnitSet();
+  const Unit1 = function() {};
+  Unit1.prototype = {
+    __init: function(units) {
+      t.is(units.require('test.test1'), this);
+    }
+  };
+
+  const Unit2 = function() {};
+  Unit2.prototype = {
+    __init: function(units) {
+      t.is(units.require('test.test2'), this);
+    }
+  };
+
+  root.add('test', { 'test1': new Unit1() });
+  root.add('test', { 'test2': new Unit2() });
+  root.init();
+
+  const res = root.require('test');
+  t.true(res instanceof UnitSet);
+  t.truthy(res._units);
+  t.truthy(res._units.test1);
+  t.truthy(res._units.test2);
+});
