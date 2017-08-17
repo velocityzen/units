@@ -21,7 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/velocityzen/units.git"
   },
-  "version": "2.2.0",
+  "version": "2.2.1",
   "scripts": {
     "test": "ava"
   },
