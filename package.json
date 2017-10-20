@@ -15,7 +15,7 @@
     "init",
     "module"
   ],
-  "main": "./lib/index",
+  "main": "./index",
   "name": "units",
   "repository": {
     "type": "git",
@@ -23,9 +23,10 @@
   },
   "version": "2.2.1",
   "scripts": {
-    "test": "ava"
+    "test": "nyc ava"
   },
   "devDependencies": {
-    "ava": "^0.22.0"
+    "ava": "^0.22.0",
+    "nyc": "^11.2.1"
   }
 }

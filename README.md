@@ -3,12 +3,13 @@
 [![NPM Version](https://img.shields.io/npm/v/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 [![NPM Downloads](https://img.shields.io/npm/dt/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 
-Module-like system with two step initialization and definable namespaces for application modules.
+Module-like system with two step initialization and definable namespaces for application modules, plugins, extensions.
 
 ## Example
 
 ```js
-const units = new UnitSet();
+const Units = require('units');
+const units = new Units();
 
 const Controller = function () {
   this.db = undefined;
@@ -43,7 +44,7 @@ Controller.prototype.__init = function (units) {
 };
 ```
 
-### Interface methods
+### Interface methods and properties
 
 #### __init
 Function, unit initialisation
@@ -54,13 +55,13 @@ Boolean, means that this unit, when required, will be returned inited
 #### __instance
 Function, If method present it will be called when a unit is required and it should return what you want to return instead of the unit class itself.
 
-## UnitSet
+## Units
 
-`UnitSet` is a set of units. The root `UnitSet` that will contain all others you should create manually. All others will be created as in the example:
+`Units` is a single class that manages all the structure. The root `Units` that will contain all others you should create manually. All others will be created as in this example:
 
 ```js
 // this is our root unit set
-const units = new UnitSet();
+const units = new Units();
 
 units.add({
   resources: {
@@ -76,7 +77,7 @@ units.add({
 });
 ```
 
-This will create unit sets `resources`, `user`, `post` with units `api` and `controller`. From `resources.post.api` you have access to all units:
+This will create units `resources` as a container, `user`, `post` with units `api` and `controller`. From `resources.post.api` you have access to all units:
 
 ```js
 const Api = function() {
@@ -96,9 +97,7 @@ Api.prototype.__init = function(units) {
 
 #### add()
 
-adds units or units sets
-
-You can use it as aliases for `addAll` and `addSet` methods. However, there is one more possibility. You can add a plain object, not a Unit or UnitSet, and it will create UnitSet automatically. Examples:
+Adds units or units sets. You can add a plain object, not Units, and it will create Units automatically. Examples:
 
 ```js
 units.add('user', {
@@ -116,38 +115,21 @@ units.add('user', () => {
 })
 ```
 
-#### alias(key, dstKey)
-
-Sets alias for key: dstKey will be obtained instead of key on get() and require() calls
-
-#### expose(key, obj)
+#### expose(obj)
 
 like `add(key, obj)`, but `__init` will not be called on this unit (so, a unit may omit `__init` implementation), used to expose constant or any object without `__init` method as a unit
 
-#### extend(key, obj)
+#### extend(obj)
 
-Like expose but if unit `key` exist just extends it with `obj`
+Like expose but if unit exist just extends it with `obj`
 
-### addInitRequired(key, unit)
+### join(units)
 
-like `add(key, obj)`, but will ensure that `__init` is called on that unit when it's being got by `get` or `require`, for units that are unusable unless inited
-
-### addAll(obj)
-
-adds all units sets from object with corresponding keys
-
-### addSet(key, units)
-
-makes units child UnitSet, adds all child units to itself under key specified
-  * units have a unit with key '~', it will be added directly under key specified, instead of key+'.~'
-
-### joinSet(units)
-
-add all units of UnitSet specified to self, without any extra magic
+add all units of `units` specified to self, without any extra magic
 
 ### get(key)
 
-gets unit under key specified, tries parent if no unit found and parent is present, takes into account aliases
+gets unit under `key` specified, tries parent if no unit found and parent is present. If `key` omited and units instance has representation returns it.
 
 ### require(key)
 
@@ -178,10 +160,9 @@ calls `__init` method on all added units
 
 ## Iterable
 ```js
-  for (let key of unitSet) {
+  for (let key of units) {
     console.log(key); // will print all units keys from this unit set
   }
 ```
-
 
 License MIT
