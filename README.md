@@ -100,24 +100,22 @@ Api.prototype.__init = function(units) {
 Adds units or units sets. You can add a plain object, not Units, and it will create Units automatically. Examples:
 
 ```js
-units.add('user', {
+units.add({ user: {
   api: new Api(),
   controller: new Controller()
-})
+}})
 
 //or
 
-units.add('user', () => {
-  return {
-    api: new Api(),
-    controller: new Controller()
-  }
-})
+units.add({ user: () => ({
+  api: new Api(),
+  controller: new Controller()
+})})
 ```
 
 #### expose(obj)
 
-like `add(key, obj)`, but `__init` will not be called on this unit (so, a unit may omit `__init` implementation), used to expose constant or any object without `__init` method as a unit
+like `add(obj)`, but `__init` will not be called on this unit (so, a unit may omit `__init` implementation), used to expose constant or any object without `__init` method as a unit
 
 #### extend(obj)
 
