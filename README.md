@@ -3,7 +3,7 @@
 [![NPM Version](https://img.shields.io/npm/v/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 [![NPM Downloads](https://img.shields.io/npm/dt/units.svg?style=flat-square)](https://www.npmjs.com/package/units)
 
-Module-like system with two step initialization and definable namespaces for application modules, plugins, extensions.
+Module-like system with two-step initialization and definable namespaces for application modules, plugins, extensions.
 
 ## Example
 
@@ -93,7 +93,11 @@ Api.prototype.__init = function(units) {
 
 ```
 
-### Methods
+## Methods
+
+### constructor(units)
+
+If `units` present passes it to `add` method.
 
 #### add()
 
@@ -123,19 +127,23 @@ Like expose but if unit exist just extends it with `obj`
 
 ### join(units)
 
-add all units of `units` specified to self, without any extra magic
+Add all units of `units` specified to self, without any extra magic
+
+### has(key)
+
+Returns `true` if units exist under the `key`. Otherwise returns `false`.
 
 ### get(key)
 
-gets unit under `key` specified, tries parent if no unit found and parent is present. If `key` omited and units instance has representation returns it.
+Gets unit under `key` specified, tries parent if no unit found and parent is present. If `key` omitted and units instance has representation returns it.
 
 ### require(key)
 
-calls `get` internally and returns a result if not null, otherwise, throws an error
+Calls `get` internally and returns a result if not null, otherwise, throws an error
 
 ### match(regexp, function)
 
-calls the `function` for every unit name that matches `regexp`. The first argument in the function is always the matched unit. All others are matches from the regexp.
+Calls the `function` for every unit name that matches `regexp`. The first argument in the function is always the matched unit. All others are matches from the regexp.
 
 ```js
   //example from matter-in-motion lib
@@ -146,7 +154,7 @@ calls the `function` for every unit name that matches `regexp`. The first argume
 
 ### forEach(function)
 
-calls the 'function' for evry unit.
+Calls the 'function' for every unit.
 
 ```js
   units.forEach((unit, name) => console.log(name));
@@ -154,7 +162,7 @@ calls the 'function' for evry unit.
 
 ### init()
 
-calls `__init` method on all added units
+Calls `__init` method on all added units
 
 ## Iterable
 ```js

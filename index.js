@@ -3,9 +3,10 @@
 const UNITS = Symbol('Units');
 const isUnit = value => value.__init || Array.isArray(value) || typeof value !== 'object';
 
-const Units = function() {
+const Units = function(units) {
   this.inited = false;
   this[UNITS] = {};
+  units && this.add(units);
 }
 
 Units.prototype.path = '.';
@@ -133,6 +134,10 @@ Units.prototype.require = function(key) {
     throw new Error('Unit is required: ' + key);
   }
   return unit;
+};
+
+Units.prototype.has = function(key = this.self) {
+  return this.getUnits(key) !== undefined;
 };
 
 Units.prototype.get = function(key = this.self) {

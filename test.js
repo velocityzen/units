@@ -221,8 +221,7 @@ test('tests match method', t => {
 });
 
 test('tests forEach method', t => {
-  const units = new Units();
-  units.add({
+  const units = new Units({
     level10: {
       level21: 'level2 string',
       level22: 'level2 string'
@@ -311,3 +310,16 @@ test('adds function that returns units declaration', t => {
 
   t.is(units.require('unit.deep'), 'level');
 });
+
+test('check has method', t => {
+  const units = new Units({
+    '@': 'self',
+    test1: 'test',
+    test2: false
+  });
+
+  t.true(units.has());
+  t.true(units.has('test1'));
+  t.true(units.has('test2'));
+  t.false(units.has('non'));
+})

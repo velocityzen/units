@@ -6,7 +6,7 @@
   "bugs": {
     "url": "https://github.com/velocityzen/units/issues"
   },
-  "description": "Module-like system with two step initialization",
+  "description": "Module-like system with two-step initialization",
   "directories": {
     "lib": "./lib"
   },
