@@ -322,4 +322,33 @@ test('check has method', t => {
   t.true(units.has('test1'));
   t.true(units.has('test2'));
   t.false(units.has('non'));
-})
+});
+
+test('adds a sub unit to init required unit with custom instance', t => {
+  const Unit = function() {};
+  Unit.prototype = {
+    __initRequired: true,
+    __init: function() {
+      this.inited = true;
+      t.pass();
+    },
+    __instance: function() {
+      return { i: this.inited }
+    }
+  };
+
+  const SubUnit = function() {}
+  SubUnit.prototype = {
+    __init: function(units) {
+      this.inited = units.require('test').i;
+      t.true(this.inited);
+    }
+  }
+
+  t.plan(3);
+  const units = new Units({ test: new Unit() });
+  units.add({ test: { sub: new SubUnit() } })
+  units.init();
+  const sub = units.require('test.sub');
+  t.true(sub.inited);
+});

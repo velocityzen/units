@@ -187,6 +187,7 @@ Units.prototype.init = function() {
     return;
   }
 
+  this.inited = true;
   for (let key in this[UNITS]) {
     let unit = this[UNITS][key];
     if (key === this.self) {
@@ -195,7 +196,6 @@ Units.prototype.init = function() {
       this[UNITS][key].init();
     }
   }
-  this.inited = true;
 };
 
 Units.prototype[Symbol.iterator] = function() {
