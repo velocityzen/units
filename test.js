@@ -311,7 +311,7 @@ test('adds function that returns units declaration', t => {
   t.is(units.require('unit.deep'), 'level');
 });
 
-test('check has method', t => {
+test('checks has method', t => {
   const units = new Units({
     '@': 'self',
     test1: 'test',
@@ -323,6 +323,24 @@ test('check has method', t => {
   t.true(units.has('test2'));
   t.false(units.has('non'));
 });
+
+test('checks \'@\' unit with subunits', t => {
+  const units = new Units({
+    root: {
+      '@': 'self',
+      test: {
+        test1: 'test',
+        test2: false
+      }
+    }
+  });
+
+  t.true(units.has('root'));
+  t.true(units.has('root.test'));
+  t.true(units.has('root.test.test1'));
+  t.true(units.has('root.test.test2'));
+});
+
 
 test('adds a sub unit to init required unit with custom instance', t => {
   const Unit = function() {};
