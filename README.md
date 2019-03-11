@@ -11,19 +11,21 @@ Module-like system with two-step initialization and definable namespaces for app
 const Units = require('units');
 const units = new Units();
 
-const Controller = function () {
-  this.db = undefined;
-};
+class Controller {
+  constructor() {
+    this.db = undefined;
+  }
 
-Controller.prototype.__init = function (units) {
-  // all units are instantiated at this point
-  // getting components we're depended on
-  this.db = units.require('db');
-};
+  __init(units) {
+    // all units are instantiated at this point
+    // getting components we're depended on
+    this.db = units.require('db');
+  }
+}
 
 units.add({
   controller: new Controller()
-});
+})
 
 units.init(); // calls __init() function of every unit internally
 ```
@@ -33,15 +35,17 @@ units.init(); // calls __init() function of every unit internally
 Unit is a simple interface
 
 ```js
-const Controller = function () {
-  this.db = undefined;
-};
+class Controller {
+  constructor() {
+    this.db = undefined;
+  }
 
-Controller.prototype.__init = function (units) {
-  // all units are instantiated at this point
-  // getting components we're depended on
-  this.db = units.require('db');
-};
+  __init(units) {
+    // all units are instantiated at this point
+    // getting components we're depended on
+    this.db = units.require('db');
+  }
+}
 ```
 
 ### Interface methods and properties
@@ -74,7 +78,7 @@ units.add({
       controller: new Controller()
     }
   }
-});
+})
 ```
 
 This will create units `resources` as a container, `user`, `post` with units `api` and `controller`. From `resources.post.api` you have access to all units:
