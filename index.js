@@ -1,13 +1,18 @@
-"use strict"
+const handler = require('./proxy_handler');
+
 const UNITS = Symbol('Units');
 const PATH = '.';
 const SELF = '@';
-const isUnit = value => value.__init || Array.isArray(value) || typeof value !== 'object';
+const EXPOSE = '@expose';
+const EXTEND = '@extend';
+
+const isUnit = value => value.init || Array.isArray(value) || typeof value !== 'object';
 
 class Units {
   constructor(units) {
     this.inited = false;
     this[UNITS] = {};
+    this.proxy = new Proxy(this, handler);
     units && this.add(units);
   }
 
@@ -30,8 +35,8 @@ class Units {
 
     const type = typeof arg2;
     const isFunc2 = type === 'function';
-    if (!arg2.__init && (type === 'object' || isFunc2)) {
-      const units = isFunc2 ? arg2(this) : arg2;
+    if (!arg2.init && (type === 'object' || isFunc2)) {
+      const units = isFunc2 ? arg2(this.proxy) : arg2;
       this._add(arg1, units);
       return this;
     }
@@ -41,13 +46,13 @@ class Units {
   }
 
   addObject(obj) {
-    const units = typeof obj === 'function' ? obj(this) : obj;
-    if (units.__extend) {
-      return this.extend(obj);
+    const units = typeof obj === 'function' ? obj(this.proxy) : obj;
+    if (units[EXTEND]) {
+      return this.extend(units);
     }
 
-    if (obj.__expose) {
-      return this.expose(obj);
+    if (units[EXPOSE]) {
+      return this.expose(units);
     }
 
     for (const key in units) {
@@ -88,7 +93,7 @@ class Units {
   }
 
   extend(obj) {
-    delete obj.__extend;
+    delete obj[EXTEND];
     const unit = this[UNITS][SELF];
 
     if (typeof unit !== 'object') {
@@ -102,10 +107,10 @@ class Units {
   }
 
   expose(obj) {
-    delete obj.__expose;
+    delete obj[EXPOSE];
     this._add(SELF, obj);
     return this;
-  };
+  }
 
   forEach(cb, ctx = this) {
     for (const key of this) {
@@ -157,12 +162,16 @@ class Units {
       return this;
     }
 
-    if (!this.inited && unit.__initRequired) {
+    if (!this.inited && unit.initRequired) {
       this.init();
     }
 
-    if (unit.__instance) {
-      return unit.__instance();
+    if (unit.instance) {
+      if (typeof unit.instance === 'function') {
+        return unit.instance();
+      }
+
+      return unit.instance;
     }
 
     return unit;
@@ -190,7 +199,7 @@ class Units {
     for (const key in this[UNITS]) {
       const unit = this[UNITS][key];
       if (key === SELF) {
-        unit.__init && unit.__init(this);
+        unit.init && unit.init(this.proxy);
       } else {
         this[UNITS][key].init();
       }

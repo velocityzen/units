@@ -3,24 +3,25 @@ const test = require('ava');
 const Units = require('./index');
 
 test('creates a simple unit and adds it to root unit set', t => {
-  const units = new Units();
-  const Unit = function() {};
-  Unit.prototype.__init = function(units) {
-    t.is(units.require('unit'), this);
-  };
+  class Unit {
+    init({ unit }) {
+      t.is(unit, this);
+    }
+  }
 
-  units.add('unit', new Unit());
+  const units = new Units();
+  units.add({ unit: new Unit() });
   units.init();
 });
 
 test('creates units from object with different types of data', t => {
-  const units = new Units();
-  const Unit = function() {};
-  Unit.prototype.__init = function(units) {
-    t.is(units.require('test.deep.unit'), this);
-  };
+  class Unit {
+    init({ 'test.deep.unit': unit }) {
+      t.is(unit, this);
+    }
+  }
 
-  units.add({
+  const units = new Units({
     test: {
       string: 'string',
       number: 123,
@@ -33,6 +34,7 @@ test('creates units from object with different types of data', t => {
   });
 
   units.init();
+
   t.is(units.require('test.string'), 'string');
   t.is(units.require('test.number'), 123);
   t.is(units.require('test.boolean'), false);
@@ -68,25 +70,26 @@ test('extends defined object', t => {
 });
 
 test('all units from single configuration object', t => {
-  const units = new Units();
-  const Unit = function() {};
-  Unit.prototype.__init = function(units) {
-    t.is(units.require('test.unit'), this);
-  };
+  class Unit {
+    init({ 'test.unit': unit }) {
+      t.is(unit, this);
+    }
+  }
 
+  const units = new Units();
   units.add({
     test: {
       unit: new Unit()
     },
     expose: {
-      __expose: true,
+      '@expose': true,
       test1: 'test1'
     }
   });
 
   units.add({
     expose: {
-      __extend: true,
+      '@extend': true,
       test2: 'test2'
     }
   });
@@ -109,53 +112,90 @@ test('fails require undefined unit', t => {
   }
 });
 
-test('adds and require \'@\' unit and checks __instance method', t => {
-  const units = new Units();
-  const Unit = function() {
-    this.name = 'test unit';
-  };
-  Unit.prototype = {
-    __init: function(units) {
-      t.is(units.require('test'), 'test');
-    },
-    __instance: function() {
+test('gets optional method', t => {
+  class Unit {
+    init({ 'notexists?': unit }) {
+      t.is(unit, undefined);
+    }
+  }
+
+  const units = new Units({
+    test: new Unit()
+  });
+  units.init();
+});
+
+test('adds and require \'@\' unit and checks "instance" method', t => {
+  class Unit {
+    init({ 'test': unit }) {
+      t.is(unit, 'test');
+    }
+
+    instance() {
       return 'test'
     }
-  };
+  }
 
-  units.add({
+  const units = new Units({
     test: {
       '@': new Unit()
     }
   });
-
   units.init();
+
+  const res = units.require('test');
+  t.is(res, 'test');
+});
+
+test('adds and require \'@\' unit and checks "instance" property', t => {
+  class Unit {
+    constructor() {
+      this.instance = 'test'
+    }
+
+    init({ 'test': unit }) {
+      t.is(unit, 'test');
+    }
+  }
+
+  const units = new Units({
+    test: {
+      '@': new Unit()
+    }
+  });
+  units.init();
+
   const res = units.require('test');
   t.is(res, 'test');
 });
 
 test('adds a unit then adds another unit under the same namespace', t => {
-  const units = new Units();
-  const Unit1 = function() {
-    this.name = 'unit 1';
-  };
-  Unit1.prototype = {
-    __init: function(units) {
-      t.is(units.require('test.test1'), this);
+  class Unit1 {
+    constructor() {
+      this.name = 'unit 1';
     }
-  };
 
-  const Unit2 = function() {
-    this.name = 'unit 2';
-  };
-  Unit2.prototype = {
-    __init: function(units) {
-      t.is(units.require('test.test2'), this);
+    init({ 'test.test1': unit }) {
+      t.is(unit, this);
     }
-  };
+  }
 
-  units.add('test', { 'test1': new Unit1() });
-  units.add('test', { 'test2': new Unit2() });
+  class Unit2 {
+    constructor() {
+      this.name = 'unit 2';
+    }
+
+    init({ 'test.test2': unit }) {
+      t.is(unit, this);
+    }
+  }
+
+  const units = new Units({
+    test: {
+      test1: new Unit1()
+    }
+  });
+  units.add({ test: { 'test2': new Unit2() } });
   units.init();
 
   const res = units.require('test');
@@ -170,7 +210,7 @@ test('extends object', t => {
   units.add({
     level1: {
       level2: {
-        __expose: true,
+        '@expose': true,
         test1: 'test1'
       }
     }
@@ -179,7 +219,7 @@ test('extends object', t => {
   units.add({
     level1: {
       level2: {
-        __extend: true,
+        '@extend': true,
         test2: 'test2'
       }
     }
@@ -233,54 +273,56 @@ test('tests forEach method', t => {
   });
 
   t.plan(5)
-  units.forEach(() => {
-    t.pass();
-  });
+  units.forEach(() => t.pass());
 });
 
 test('inits unts two times', t => {
-  const units = new Units();
-  const Unit = function() {};
-  Unit.prototype.__init = function() {
-    t.pass();
-  };
+  class Unit {
+    init() {
+      t.pass();
+    }
+  }
 
   t.plan(1);
+
+  const units = new Units();
   units.add('unit', new Unit());
   units.init();
   units.init();
 });
 
 test('requires initRequired unit', t => {
-  const units = new Units();
-  const Unit = function() {};
-  Unit.prototype.__initRequired = true;
-  Unit.prototype.__init = function() {
-    this.inited = true;
-    t.pass();
-  };
+  class Unit {
+    constructor() {
+      this.initRequired = true;
+    }
+
+    init() {
+      this.inited = true;
+      t.pass();
+    }
+  }
 
   t.plan(2);
-  units.add('unit', new Unit());
+  const units = new Units({
+    unit: new Unit()
+  });
+
   t.is(units.require('unit').inited, true);
   units.init();
 });
 
 test('joins two units', t => {
-  const units1 = new Units();
-  const units2 = new Units();
-  units1.add('unit1', 1);
-  units2.add('unit2', 2);
+  const units1 = new Units({ unit1: 1 });
+  const units2 = new Units({ unit2: 2 });
   units1.join(units2);
   t.is(units1.require('unit1'), 1);
   t.is(units1.require('unit2'), 2);
 });
 
 test('fails to joins two units', t => {
-  const units1 = new Units();
-  const units2 = new Units();
-  units1.add('unit', 1);
-  units2.add('unit', 2);
+  const units1 = new Units({ unit: 1 });
+  const units2 = new Units({ unit: 2 });
 
   try {
     units1.join(units2);
@@ -293,20 +335,17 @@ test('fails to joins two units', t => {
 test('adds units to units', t => {
   const units1 = new Units();
   const units2 = new Units();
-  units1.add('units', units2);
+  units1.add({ units: units2 });
   t.is(units1.require('units'), units2);
 });
 
 test('adds function that returns units declaration', t => {
   const units = new Units();
-  units.add(u => {
-    t.is(u, units);
-    return {
-      unit: () => ({
-        deep: 'level'
-      })
-    }
-  });
+  units.add(() => ({
+    unit: () => ({
+      deep: 'level'
+    })
+  }));
 
   t.is(units.require('unit.deep'), 'level');
 });
@@ -343,22 +382,24 @@ test('checks \'@\' unit with subunits', t => {
 
 
 test('adds a sub unit to init required unit with custom instance', t => {
-  const Unit = function() {};
-  Unit.prototype = {
-    __initRequired: true,
-    __init: function() {
+  class Unit {
+    constructor() {
+      this.initRequired = true;
+    }
+
+    init() {
       this.inited = true;
       t.pass();
-    },
-    __instance: function() {
+    }
+
+    instance() {
       return { i: this.inited }
     }
-  };
+  }
 
-  const SubUnit = function() {}
-  SubUnit.prototype = {
-    __init: function(units) {
-      this.inited = units.require('test').i;
+  class SubUnit {
+    init({ test }) {
+      this.inited = test.i;
       t.true(this.inited);
     }
   }
