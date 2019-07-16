@@ -112,6 +112,19 @@ class Units {
     return this;
   }
 
+  alias(aliasKey, srcKey) {
+    const srcUnit = this.getUnits(srcKey);
+    if (srcUnit === undefined) {
+      throw new Error('Unit is required: ' + srcKey);
+    }
+
+    if (this[UNITS][aliasKey]) {
+      throw new Error(`Units with the key '${aliasKey}' is already exists`);
+    }
+
+    this[UNITS][aliasKey] = srcUnit;
+  }
+
   forEach(cb, ctx = this) {
     for (const key of this) {
       cb.call(ctx, this.get(key), key);

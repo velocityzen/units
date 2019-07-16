@@ -411,3 +411,35 @@ test('adds a sub unit to init required unit with custom instance', t => {
   const sub = units.require('test.sub');
   t.true(sub.inited);
 });
+
+test('adds a unit and creates an alias for it', t => {
+  class Unit {
+    init() {
+      this.inited = true;
+      t.pass();
+    }
+  }
+
+  t.plan(4);
+  const units = new Units({ test: new Unit() });
+
+  try {
+    units.alias('alias', 'alias');
+    t.fail();
+  } catch (e) {
+    t.pass();
+  }
+
+  try {
+    units.alias('test', 'test');
+    t.fail();
+  } catch (e) {
+    t.pass();
+  }
+
+  units.alias('alias', 'test');
+  units.init();
+  const test = units.require('test');
+  const alias = units.require('alias');
+  t.is(test, alias);
+});
