@@ -119,7 +119,7 @@ class Units {
     }
 
     if (this[UNITS][aliasKey]) {
-      throw new Error(`Units with the key '${aliasKey}' is already exists`);
+      throw new Error(`Unit with the key '${aliasKey}' is already exists`);
     }
 
     this[UNITS][aliasKey] = srcUnit;
