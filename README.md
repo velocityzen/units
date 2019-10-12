@@ -157,6 +157,10 @@ Adds all the units from `units` to self, without any extra magic
 
 Sets the alias `aliasKey` for unit `srcKey`
 
+### isEmpty()
+
+Returns `true` if unit does not have child units. Otherwise returns `false`.
+
 ### has(key)
 
 Returns `true` if units exist under the `key`. Otherwise returns `false`.

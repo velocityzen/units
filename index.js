@@ -46,6 +46,11 @@ class Units {
   }
 
   addObject(obj) {
+    const typeofObj = typeof obj;
+    if (Array.isArray(obj) || !(typeofObj === 'object' || typeofObj === 'function')) {
+      throw new Error(`Unit '${obj}'' can not be undefined`);
+    }
+
     const units = typeof obj === 'function' ? obj(this.proxy) : obj;
     if (units[EXTEND]) {
       return this.extend(units);
@@ -155,6 +160,10 @@ class Units {
 
   has(key = SELF) {
     return this.getUnits(key) !== undefined;
+  }
+
+  isEmpty() {
+    return !Object.keys(this[UNITS]).length
   }
 
   get(key = SELF) {

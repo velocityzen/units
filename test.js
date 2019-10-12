@@ -2,6 +2,22 @@
 const test = require('ava');
 const Units = require('./index');
 
+test('checks if unit is empty', t => {
+  const units = new Units();
+  t.true(units.isEmpty());
+});
+
+test('fails to add undefined unit', t => {
+  const units = new Units();
+  try {
+    units.add({ unit: undefined });
+    t.fail();
+  } catch (e) {
+    t.pass();
+  }
+  units.init();
+});
+
 test('creates a simple unit and adds it to root unit set', t => {
   class Unit {
     init({ unit }) {
